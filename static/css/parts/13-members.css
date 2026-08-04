@@ -1,0 +1,122 @@
+
+.members-section {
+  padding: 90px 0 70px;
+}
+
+.members-wrap {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 5%;
+}
+
+.members-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+  margin-top: 28px;
+}
+
+.member-report {
+  background: var(--card-bg);
+  border: 1px solid rgba(0, 170, 255, 0.12);
+  border-radius: 20px;
+  padding: 18px 18px 20px;
+  box-shadow: 0 16px 36px rgba(0,0,0,0.22);
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.member-report::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  background: radial-gradient(circle at 20% 10%, rgba(0,170,255,0.14), transparent 60%);
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+.member-report:hover {
+  transform: translateY(-8px);
+  border-color: rgba(0,170,255,0.42);
+  box-shadow: 0 22px 46px rgba(0,170,255,0.10);
+}
+
+.member-report-top {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  position: relative;
+  z-index: 2;
+}
+
+/* УМЕНЬШЕНО НА 3px (248px → 245px) */
+.member-report__media {
+  width: 245px !important;
+  height: 245px !important;
+  border-radius: 0 !important; /* Прямоугольные углы */
+  border: 1px solid rgba(0,170,255,0.18) !important;
+  background: rgba(0,0,0,0.22) !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden !important;
+  flex: 0 0 auto !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.member-report__media img {
+  max-width: 100% !important;
+  max-height: 100% !important;
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain !important;
+  display: block !important;
+  border-radius: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.member-title {
+  font-family: "Orbitron", sans-serif;
+  font-size: 1.05rem;
+  line-height: 1.25;
+  color: rgba(255,255,255,0.95);
+  overflow-wrap: anywhere;
+}
+
+.member-desc {
+  margin-top: 12px;
+  color: rgba(170,221,255,0.92);
+  font-size: 0.95rem;
+  line-height: 1.55;
+  position: relative;
+  z-index: 2;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 6;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.members-empty {
+  margin-top: 24px;
+  text-align: center;
+  color: rgba(170,221,255,0.92);
+}
+
+.members-empty h3 {
+  font-family: "Orbitron", sans-serif;
+  margin-bottom: 8px;
+  color: rgba(255,255,255,0.95);
+}
+
+@media (max-width: 1200px) {
+  .members-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 768px) {
+  .members-grid { grid-template-columns: 1fr; }
+  .members-wrap { padding: 0 16px; }
+}

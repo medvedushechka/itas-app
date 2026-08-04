@@ -1,0 +1,80 @@
+
+/* адаптив навигации */
+@media (max-width: 1100px) {
+  .desktop-nav ul { gap: 20px; }
+  .nav-item span { font-size: 14px; }
+}
+
+@media (max-width: 1200px) {
+  .hero {
+    grid-template-columns: 1fr;
+    gap: 50px;
+    text-align: center;
+  }
+  .hero-details { align-items: center; }
+  .hero-buttons { justify-content: center; }
+  .hero-content h1 { font-size: 3.5rem; }
+  .section-header h2 { font-size: 3rem; }
+}
+
+/* ===== MOBILE MENU (важно) ===== */
+@media (max-width: 992px) {
+  header { padding: 0; }
+  .header-container { gap: 12px; }
+
+  .desktop-nav,
+  .social-sponsor-container {
+    display: none !important;
+  }
+
+  .mobile-menu-btn { display: block; flex-shrink: 0; }
+
+  /* по умолчанию меню закрыто */
+  .mobile-nav {
+    display: none !important;
+  }
+  .mobile-menu-overlay {
+    display: none !important;
+  }
+
+  /* открытое меню */
+  .mobile-nav.open {
+    display: flex !important;
+  }
+  .mobile-menu-overlay.open {
+    display: block !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .topic-card { min-width: 260px; }
+}
+
+/* критично: сетки в 1 колонку */
+@media (max-width: 768px) {
+  .hero { padding: 90px 16px 70px; grid-template-columns: 1fr; }
+  section { padding: 70px 16px; }
+
+  .features-grid,
+  .speakers-grid,
+  .tariffs-grid,
+  .audience-cards,
+  .footer-content {
+    grid-template-columns: 1fr !important;
+  }
+
+  .hero-buttons {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .buy-ticket,
+  .program-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .hero-slider { height: 260px; }
+}
+
+/* sponsor btn не должен раздувать header */
+.sponsor-btn { min-width: 0; max-width: 100%; }

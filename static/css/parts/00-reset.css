@@ -1,0 +1,31 @@
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+img,
+video,
+canvas,
+svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Когда открыто мобильное меню — блокируем скролл страницы */
+html.no-scroll,
+html.no-scroll body {
+  overflow: hidden !important;
+}
+
+body.menu-open {
+  overflow: hidden;
+}

@@ -1,0 +1,79 @@
+/* Бегущая строка под хэдером */
+.itas-ticker {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  padding: 8px 0;
+
+  background: rgba(8, 10, 18, 0.55);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.itas-ticker__fade {
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 96px;
+  z-index: 2;
+}
+
+.itas-ticker__fade--left {
+  left: 0;
+  background: linear-gradient(to right, rgba(8, 10, 18, 0.95), rgba(8, 10, 18, 0));
+}
+
+.itas-ticker__fade--right {
+  right: 0;
+  background: linear-gradient(to left, rgba(8, 10, 18, 0.95), rgba(8, 10, 18, 0));
+}
+
+.itas-ticker__viewport {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.itas-ticker__track {
+  display: inline-flex;
+  align-items: center;
+  gap: 42px;
+  will-change: transform;
+  animation: itasTickerMove var(--ticker-duration, 18s) linear infinite;
+  transform: translate3d(0, 0, 0);
+}
+
+.itas-ticker__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+
+  color: rgba(255, 255, 255, 0.90);
+  font-size: 14px;
+  letter-spacing: 0.2px;
+  text-transform: none;
+}
+
+.itas-ticker__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.55);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.18);
+}
+
+@keyframes itasTickerMove {
+  from { transform: translate3d(0%, 0, 0); }
+  to   { transform: translate3d(-50%, 0, 0); }
+}
+
+/* если у пользователя включено уменьшение анимации */
+@media (prefers-reduced-motion: reduce) {
+  .itas-ticker__track { animation: none; }
+}

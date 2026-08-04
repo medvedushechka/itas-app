@@ -1,0 +1,74 @@
+
+/* Звёзды и “туманности” — отдельные слои.
+   Они должны быть ВИДНЫ всегда и не зависеть от скролла. */
+
+.stars-container,
+.background-elements {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* звёзды — самый нижний слой */
+.stars-container {
+  z-index: -2;
+  opacity: 1;
+}
+
+/* пятна — поверх звёзд, но под контентом */
+.background-elements {
+  z-index: -1;
+  opacity: 1;
+}
+
+/* Звезда */
+.star {
+  position: absolute;
+  border-radius: 999px;
+  will-change: opacity, transform;
+  animation: starTwinkle var(--tw, 6s) ease-in-out var(--td, 0s) infinite;
+  filter: drop-shadow(0 0 6px rgba(255,255,255,0.18));
+}
+
+@keyframes starTwinkle {
+  0%   { transform: translateY(0) scale(1);   opacity: 0.35; }
+  50%  { transform: translateY(-1px) scale(1.12); opacity: 0.95; }
+  100% { transform: translateY(0) scale(1);   opacity: 0.45; }
+}
+
+/* Фоновые пятна */
+.blob {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(70px);
+  opacity: 0.55; /* базовая видимость */
+  will-change: transform, opacity;
+  mix-blend-mode: screen;
+  animation: blobPulse 12s ease-in-out infinite;
+}
+
+.blob-blue {
+  background: radial-gradient(circle at 30% 30%,
+    rgba(0,170,255,0.75),
+    rgba(0,170,255,0.18),
+    rgba(0,0,0,0)
+  );
+}
+
+.blob-red {
+  background: radial-gradient(circle at 30% 30%,
+    rgba(255,51,102,0.65),
+    rgba(255,51,102,0.16),
+    rgba(0,0,0,0)
+  );
+}
+
+@keyframes blobPulse {
+  0%   { transform: translate3d(0,0,0) scale(1);    opacity: 0.42; }
+  35%  { transform: translate3d(22px,-16px,0) scale(1.06); opacity: 0.62; }
+  70%  { transform: translate3d(-18px,14px,0) scale(0.98); opacity: 0.50; }
+  100% { transform: translate3d(0,0,0) scale(1);    opacity: 0.44; }
+}

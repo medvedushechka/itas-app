@@ -1,0 +1,7 @@
+Миграции базы данных управляются Flask-Migrate.
+
+Применить миграции:
+    python -m flask --app app:create_app db upgrade
+
+Создать новую миграцию после изменения моделей:
+    python -m flask --app app:create_app db migrate -m "Описание изменения"

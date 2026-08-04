@@ -1,0 +1,149 @@
+
+.topics-carousel-container {
+  position: relative;
+  margin: 50px 0;
+  overflow: hidden;
+  width: 100%;
+  max-width: 100%;
+}
+
+.topics-carousel {
+  display: flex;
+  gap: 30px;
+  transition: transform 0.3s linear;
+  padding: 20px 0;
+}
+
+.topic-card {
+  position: relative;
+  overflow: hidden;
+  background: rgba(0, 10, 30, 0.7);
+  border: 1px solid rgba(0, 170, 255, 0.1);
+  border-radius: 20px;
+  padding: 40px 30px;
+  transition: all 0.3s ease;
+  min-height: 400px;
+  z-index: 1;
+
+  flex: 0 0 calc(33.333% - 20px);
+  min-width: 350px;
+}
+
+.circles-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: visible;
+}
+
+.topic-circle {
+  position: absolute;
+  border-radius: 50%;
+  z-index: 0;
+  opacity: 0;
+  animation: circleAppear 25s infinite ease-in-out;
+}
+
+.topic-number,
+.topic-card h3,
+.topic-card ul,
+.topic-card li,
+.topic-tag {
+  position: relative;
+  z-index: 10;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.topic-card > :not(.circles-container) {
+  position: relative;
+  z-index: 10;
+}
+
+/* эффекты кругов */
+.topic-circle.filled {
+  background: radial-gradient(circle at 30% 30%, rgba(0, 170, 255, 0.9) 0%, rgba(0, 170, 255, 0.6) 30%, rgba(0, 170, 255, 0.3) 60%, transparent 80%);
+  box-shadow: 0 0 60px rgba(0, 170, 255, 0.5), inset 0 0 40px rgba(0, 170, 255, 0.3);
+}
+
+.topic-circle.half-filled {
+  background: radial-gradient(circle at 30% 30%, rgba(0, 170, 255, 0.7) 0%, rgba(0, 170, 255, 0.4) 20%, rgba(0, 170, 255, 0.2) 40%, transparent 50%);
+  box-shadow: 0 0 40px rgba(0, 170, 255, 0.4), inset 0 0 20px rgba(0, 170, 255, 0.2);
+}
+
+.topic-circle.empty {
+  background: radial-gradient(circle at 30% 30%, rgba(0, 170, 255, 0.3) 0%, rgba(0, 170, 255, 0.1) 10%, transparent 20%);
+  box-shadow: 0 0 20px rgba(0, 170, 255, 0.3);
+}
+
+@keyframes circleAppear {
+  0% { opacity: 0; transform: translate(var(--start-x), var(--start-y)) scale(0.3); }
+  10% { opacity: var(--opacity-level); transform: translate(var(--start-x), var(--start-y)) scale(1); }
+  25% { opacity: var(--opacity-level); transform: translate(var(--pos1-x), var(--pos1-y)) scale(1); }
+  40% { opacity: var(--opacity-level); transform: translate(var(--pos2-x), var(--pos2-y)) scale(1); }
+  55% { opacity: var(--opacity-level); transform: translate(var(--pos3-x), var(--pos3-y)) scale(1); }
+  70% { opacity: var(--opacity-level); transform: translate(var(--pos4-x), var(--pos4-y)) scale(1); }
+  100% { opacity: 0; transform: translate(var(--pos4-x), var(--pos4-y)) scale(0.3); }
+}
+
+@keyframes circleGlow {
+  0%, 100% { filter: brightness(1) blur(0px); }
+  50% { filter: brightness(1.5) blur(1px); }
+}
+
+.topic-circle {
+  animation: circleAppear var(--duration) infinite ease-in-out, circleGlow 8s infinite ease-in-out;
+}
+
+/* ✅ ВОТ ТУТ ПРАВКА: цифры 01/02/03 светлее */
+.topic-number {
+  font-family: "Orbitron", sans-serif;
+  font-size: 4rem;
+  color: rgba(210, 245, 255, 0.28); /* было слишком темно */
+  margin-bottom: 20px;
+  font-weight: 700;
+}
+
+.topic-card h3 {
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+  color: var(--light-text);
+  line-height: 1.4;
+}
+
+.topic-card ul {
+  list-style: none;
+  margin-bottom: 25px;
+}
+
+.topic-card li {
+  color: var(--gray-text);
+  margin-bottom: 10px;
+  padding-left: 25px;
+  position: relative;
+  line-height: 1.6;
+}
+
+.topic-card li::before {
+  content: "→";
+  position: absolute;
+  left: 0;
+  color: var(--primary-blue);
+}
+
+.topic-tag {
+  display: inline-block;
+  background: rgba(0, 170, 255, 0.1);
+  color: var(--primary-blue);
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  z-index: 1;
+  position: relative;
+}
+
+/* Убираем стрелки карусели */
+.carousel-btn {
+  display: none !important;
+}

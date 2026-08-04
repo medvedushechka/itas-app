@@ -1,0 +1,68 @@
+{% extends 'admin/master.html' %}
+
+{% block body %}
+  <div class="itas-panel">
+    <div class="itas-panel__head">
+      <div>
+        <h1 class="itas-h1">Панель управления</h1>
+        <div class="itas-muted">Подсказки: что за что отвечает на главной странице и как правильно заполнять поля.</div>
+      </div>
+      <div class="itas-panel__actions">
+        <form method="post" action="{{ url_for('auth.logout') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="itas-link" type="submit">Выйти</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="itas-cards">
+      <a class="itas-card" href="/admin/carousel/">
+        <div class="itas-chip">HERO</div>
+        <div class="itas-card__title">Карусель</div>
+        <div class="itas-card__text">Слайды справа в Hero (картинка/гиф/видео)</div>
+      </a>
+
+      <a class="itas-card" href="/admin/committee/">
+        <div class="itas-chip">BLOCK</div>
+        <div class="itas-card__title">Комитеты</div>
+        <div class="itas-card__text">Карточки профильных комитетов (bullets — каждый пункт с новой строки)</div>
+      </a>
+
+      <a class="itas-card" href="/admin/member/">
+        <div class="itas-chip">MEM</div>
+        <div class="itas-card__title">Участники</div>
+        <div class="itas-card__text">Карточки участников + загрузка logo (картинка/гиф)</div>
+      </a>
+
+      <a class="itas-card" href="/admin/news/">
+        <div class="itas-chip">NEWS</div>
+        <div class="itas-card__title">Новости</div>
+        <div class="itas-card__text">Блоки новостей: media + size (small/big) + публикация</div>
+      </a>
+
+      <a class="itas-card" href="/admin/ticker-settings/">
+        <div class="itas-chip">TICKER</div>
+        <div class="itas-card__title">Тикер: настройки</div>
+        <div class="itas-card__text">Включить/выключить и “секунд на 1 новость”</div>
+      </a>
+
+      <a class="itas-card" href="/admin/ticker/">
+        <div class="itas-chip">TICKER</div>
+        <div class="itas-card__title">Тикер: новости</div>
+        <div class="itas-card__text">Несколько строк, порядок показа, можно отключать отдельные</div>
+      </a>
+    </div>
+
+    <div class="itas-help">
+      <h2 class="itas-h2">Правила заполнения</h2>
+      <ul class="itas-ul">
+        <li><b>position</b>: порядок (меньше = раньше).</li>
+        <li><b>bullets</b>: каждый пункт — с новой строки.</li>
+        <li><b>media_file / logo</b>: загружай файл с компьютера → сохранится в <code>/static/uploads/</code>.</li>
+        <li><b>size</b> у новостей: <code>small</code> или <code>big</code>.</li>
+        <li><b>media_type</b>: <code>image</code> / <code>gif</code> / <code>video</code>.</li>
+        <li><b>Тикер</b>: включается в <code>/admin/ticker-settings/</code>, новости — в <code>/admin/ticker/</code>.</li>
+      </ul>
+    </div>
+  </div>
+{% endblock %}

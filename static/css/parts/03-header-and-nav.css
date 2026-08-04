@@ -1,0 +1,545 @@
+/* Header: rgba(0,0,0,0.62) + улучшенный стиль меню + правильная mobile-nav логика */
+
+header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
+  height: 80px;
+  display: flex;
+  align-items: center;
+
+  background: rgba(0, 0, 0, 0.62);
+  border-bottom: 1px solid rgba(0, 170, 255, 0.18);
+
+  backdrop-filter: blur(8px);
+}
+
+/* ===== ЛОГО: солнце круглое и больше, орбита не режется ===== */
+.logo-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 220px;
+  height: 80px;
+  flex-shrink: 0;
+}
+
+.logo-container {
+  position: relative;
+  width: 220px;
+  height: 80px;
+  overflow: visible;
+}
+
+.logo-gif,
+.logo-sun {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+/* центр орбиты — рядом с солнцем */
+.planets-container {
+  position: absolute;
+  left: 44px;
+  top: 50%;
+  width: 0;
+  height: 0;
+  transform: translateY(-50%);
+  overflow: visible;
+}
+
+.logo-text {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
+  white-space: nowrap;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* ===== КОМПАКТ-ЛОГО (при скролле) ===== */
+.planets-fixed-container {
+  display: none;
+  position: relative;
+  width: 170px;
+  height: 80px;
+  flex-shrink: 0;
+}
+
+.planets-fixed-inner {
+  position: relative;
+  width: 170px;
+  height: 80px;
+  overflow: visible;
+}
+
+.logo-gif-fixed,
+.logo-sun-fixed {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+.planets-container-fixed {
+  position: absolute;
+  left: 38px;
+  top: 50%;
+  width: 0;
+  height: 0;
+  transform: translateY(-50%);
+  overflow: visible;
+}
+
+.logo-text-fixed {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
+  white-space: nowrap;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* при скролле: прячем большое лого и показываем компакт */
+header.header--compact .logo-wrapper {
+  opacity: 0;
+  transform: translateX(-10px) scale(0.92);
+  pointer-events: none;
+}
+
+header.header--compact .planets-fixed-container {
+  display: block;
+}
+
+/* ===== Компоновка шапки ===== */
+.header-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+  padding: 10px 5%;
+  min-width: 0;
+}
+
+/* Навигация по центру */
+.desktop-nav {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  min-width: 0;
+}
+
+.desktop-nav ul {
+  list-style: none;
+  display: flex;
+  gap: 34px;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 0;
+  margin: 0;
+}
+
+.nav-item {
+  position: relative;
+  cursor: pointer;
+  padding: 10px 0;
+  user-select: none;
+}
+
+.nav-item span,
+.nav-item a {
+  display: inline-block;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  text-decoration: none;
+
+  transition: transform .18s ease, color .18s ease, text-shadow .18s ease;
+}
+
+/* Подчёркивание и свечение */
+.nav-item::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 6px;
+  width: 0;
+  height: 2px;
+  transform: translateX(-50%);
+  border-radius: 2px;
+  background: linear-gradient(
+    90deg,
+    rgba(0,170,255,0),
+    rgba(0,170,255,1),
+    rgba(255,51,102,0.95),
+    rgba(0,170,255,0)
+  );
+  transition: width .22s ease;
+  opacity: 0.95;
+}
+
+.nav-item::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0px;
+  width: 0;
+  height: 10px;
+  transform: translateX(-50%);
+  background: radial-gradient(circle, rgba(0,170,255,0.22), transparent 70%);
+  filter: blur(2px);
+  transition: width .22s ease;
+  opacity: 0.9;
+}
+
+.nav-item:hover span,
+.nav-item:hover a {
+  color: #00aaff;
+  transform: translateY(-1px);
+  text-shadow: 0 0 16px rgba(0, 170, 255, 0.35);
+}
+
+.nav-item:hover::before { width: 110%; }
+.nav-item:hover::after  { width: 140%; }
+
+/* Правая часть */
+.social-sponsor-container {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  flex-shrink: 0;
+}
+
+.social-icons {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.social-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(0, 136, 204, 0.10);
+  border: 1px solid rgba(0, 136, 204, 0.30);
+
+  color: rgba(255,255,255,0.92);
+  text-decoration: none;
+  font-size: 20px;
+
+  transition: transform .18s ease, background .18s ease, border-color .18s ease, box-shadow .18s ease, color .18s ease;
+}
+
+.social-icon:hover {
+  transform: scale(1.12);
+  border-color: rgba(0,170,255,0.85);
+  background: rgba(0,170,255,0.18);
+  box-shadow: 0 0 18px rgba(0, 170, 255, 0.25);
+  color: #00aaff;
+}
+
+/* Кнопка справа */
+.sponsor-btn {
+  background: transparent;
+  color: rgba(255,255,255,0.92);
+  padding: 14px 30px;
+  border-radius: 50px;
+  border: 2px solid rgba(255,255,255,0.88);
+
+  font-family: "Orbitron", sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 1px;
+
+  height: 54px;
+  cursor: pointer;
+
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sponsor-btn:hover {
+  background: linear-gradient(135deg, rgba(0,136,204,0.85), rgba(0,170,255,0.85));
+  border-color: rgba(0,170,255,0.95);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(0, 170, 255, 0.22);
+}
+
+/* =========================================================
+   MOBILE MENU
+   ========================================================= */
+
+.mobile-menu-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(2px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .18s ease;
+  z-index: 999;
+}
+
+.mobile-nav {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: min(360px, 92vw);
+
+  background: rgba(0,0,0,0.92);
+  border-left: 1px solid rgba(0,170,255,0.18);
+  backdrop-filter: blur(10px);
+
+  transform: translateX(110%);
+  opacity: 0;
+  pointer-events: none;
+
+  transition: transform .22s ease, opacity .22s ease;
+  z-index: 1001;
+  padding: 18px 16px;
+  display: block;
+}
+
+.mobile-nav ul {
+  list-style: none;
+  padding: 14px 0 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mobile-nav a {
+  color: rgba(255,255,255,0.92);
+  text-decoration: none;
+  font-family: "Orbitron", sans-serif;
+  letter-spacing: 0.8px;
+}
+
+.mobile-nav a:hover { color: #00aaff; }
+
+.mobile-nav-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(0,170,255,0.18);
+}
+
+.mobile-logo {
+  font-family: "Orbitron", sans-serif;
+  font-weight: 800;
+  color: rgba(255,255,255,0.92);
+  letter-spacing: 1px;
+}
+
+.mobile-close-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  border: 1px solid rgba(0,170,255,0.22);
+  background: rgba(0,170,255,0.08);
+  color: rgba(255,255,255,0.92);
+  cursor: pointer;
+  transition: transform .15s ease, background .15s ease, border-color .15s ease;
+}
+.mobile-close-btn:hover {
+  transform: scale(1.06);
+  border-color: rgba(0,170,255,0.6);
+  background: rgba(0,170,255,0.14);
+}
+
+.sponsor-btn--mobile {
+  width: 100%;
+  margin-top: 16px;
+  height: 56px;
+}
+
+.mobile-social {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.mobile-social-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(0,170,255,0.22);
+  background: rgba(0,170,255,0.10);
+  color: rgba(255,255,255,0.92);
+  text-decoration: none;
+}
+
+.mobile-social-icon:hover {
+  color: #00aaff;
+  border-color: rgba(0,170,255,0.6);
+}
+
+/* Открыто: body.menu-open ставит JS */
+body.menu-open .mobile-menu-overlay {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+body.menu-open .mobile-nav {
+  transform: translateX(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* кнопка меню */
+.mobile-menu-btn {
+  display: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  border: 1px solid rgba(0,170,255,0.22);
+  background: rgba(0,170,255,0.10);
+  cursor: pointer;
+  position: relative;
+}
+
+.menu-icon,
+.menu-icon::before,
+.menu-icon::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  width: 20px;
+  height: 2px;
+  background: rgba(255,255,255,0.92);
+  transform: translateX(-50%);
+  transition: transform .18s ease, opacity .18s ease, top .18s ease;
+  border-radius: 2px;
+}
+
+.menu-icon { top: 50%; transform: translate(-50%, -50%); }
+.menu-icon::before { top: -7px; }
+.menu-icon::after  { top: 7px; }
+
+body.menu-open .menu-icon { opacity: 0; }
+body.menu-open .menu-icon::before { top: 0; transform: translateX(-50%) rotate(45deg); }
+body.menu-open .menu-icon::after  { top: 0; transform: translateX(-50%) rotate(-45deg); }
+
+@media (max-width: 992px) {
+  header { padding: 0; }
+  .header-container { padding: 10px 16px; gap: 12px; }
+
+  .desktop-nav,
+  .social-sponsor-container { display: none !important; }
+
+  .mobile-menu-btn { display: block; }
+}
+
+
+.logo-sun,
+.logo-sun-fixed {
+  position: absolute;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 35% 35%, rgba(255, 248, 190, 0.98) 0%, rgba(255, 217, 92, 0.96) 22%, rgba(255, 150, 24, 0.92) 52%, rgba(255, 92, 0, 0.82) 72%, rgba(255, 92, 0, 0.10) 100%);
+}
+
+.logo-sun::before,
+.logo-sun-fixed::before {
+  content: "";
+  position: absolute;
+  inset: -18%;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, rgba(255, 210, 72, 0.0) 58%, rgba(255, 210, 72, 0.38) 72%, rgba(255, 120, 0, 0.0) 100%);
+  animation: logoSunPulse 3.2s ease-in-out infinite;
+}
+
+.logo-sun::after,
+.logo-sun-fixed::after {
+  content: "";
+  position: absolute;
+  inset: 14%;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.45), rgba(255,255,255,0.0) 30%),
+    radial-gradient(circle at 70% 70%, rgba(255, 120, 0, 0.24), rgba(255, 120, 0, 0.0) 52%);
+  mix-blend-mode: screen;
+  animation: logoSunShimmer 5.4s linear infinite;
+}
+
+@keyframes logoSunPulse {
+  0%, 100% { transform: scale(0.96); opacity: 0.72; }
+  50% { transform: scale(1.06); opacity: 1; }
+}
+
+@keyframes logoSunShimmer {
+  0% { transform: rotate(0deg) scale(1); opacity: 0.72; }
+  50% { transform: rotate(180deg) scale(1.04); opacity: 0.96; }
+  100% { transform: rotate(360deg) scale(1); opacity: 0.72; }
+}
+
+
+/* Подстраховка: если старый rocket-cursor всё ещё попал в DOM, скрываем его */
+#rocketCursor,
+.rocket-cursor {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+html.cursor-hidden,
+html.cursor-hidden *,
+body.cursor-hidden,
+body.cursor-hidden * {
+  cursor: auto !important;
+}
+
+
+/* ===== Горячее исправление: полностью отключаем ракету-курсор ===== */
+#rocketCursor,
+.rocket-cursor,
+.click-particle {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+html,
+body,
+html *,
+body * {
+  cursor: auto !important;
+}

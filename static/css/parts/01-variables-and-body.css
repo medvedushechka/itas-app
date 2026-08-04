@@ -1,0 +1,35 @@
+
+:root {
+  --primary-blue: #00aaff;
+  --primary-dark: #0088cc;
+  --secondary-blue: #0066ff;
+  --accent-red: #ff3366;
+  --orange: #ff7700;
+  --dark-bg: #000000;
+  --light-text: #ffffff;
+  --gray-text: #aaddff;
+  --card-bg: rgba(0, 0, 0, 0.7);
+  --transition: all 0.3s ease;
+}
+
+/* ВАЖНО: базовый фон на html, чтобы bg-слои с z-index:-1/-2 были видимы */
+html {
+  background: var(--dark-bg);
+}
+
+body {
+  font-family: "Roboto", sans-serif;
+  color: var(--light-text);
+
+  /* ВАЖНО: body прозрачный, чтобы fixed background layers были видимы */
+  background: transparent;
+  background-image: none;
+  background-attachment: fixed;
+
+  overflow-x: hidden;
+  position: relative;
+  min-height: 100vh;
+
+  /* фикс “вспышек” при скролле на некоторых GPU/браузерах */
+  isolation: isolate;
+}

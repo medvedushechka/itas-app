@@ -1,0 +1,243 @@
+/* Лого + орбита слов вокруг солнца */
+
+.logo-wrapper { flex-shrink: 0; min-width: 0; }
+.logo-container { position: relative; width: 210px; height: 70px; }
+
+.logo-gif,
+.logo-sun {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+
+  box-shadow:
+    0 0 22px rgba(255, 120, 0, 0.38),
+    0 0 38px rgba(255, 60, 0, 0.22);
+}
+
+.planets-container {
+  position: absolute;
+  left: 48px;              /* центр орбиты = центр солнца */
+  top: 50%;
+  width: 0;
+  height: 0;
+  transform: translateY(-50%);
+}
+
+/* ТЕКСТ-«ПЛАНЕТЫ» */
+.logo-text {
+  position: absolute;
+  left: 0;
+  top: 0;
+
+  font-family: "Orbitron", sans-serif;
+
+  /* чуть меньше, чтобы на увеличенном радиусе не “лезло” */
+  font-size: 11px;
+
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+
+  color: rgba(255,255,255,0.92);
+
+  filter: none;
+  /* text-shadow задаётся из JS, здесь базовое */
+  text-shadow: 0 0 10px rgba(0,170,255,0.18);
+
+  pointer-events: none;
+  user-select: none;
+
+  will-change: transform, opacity;
+}
+
+/* ====== COMPACT HEADER LOGO (при скролле) ====== */
+.planets-fixed-container { display: none; }
+
+header.header--compact .planets-fixed-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+header.header--compact #mainLogo { display: none; }
+
+.logo-gif-fixed,
+.logo-sun-fixed {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow:
+    0 0 14px rgba(255, 120, 0, 0.32),
+    0 0 22px rgba(255, 60, 0, 0.20);
+}
+
+.logo-text-fixed {
+  font-family: "Orbitron", sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.9px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.90);
+  white-space: nowrap;
+}
+
+@media (max-width: 992px) {
+  .logo-container { width: 170px; height: 62px; }
+  .logo-gif,
+.logo-sun { left: 10px; width: 56px; height: 56px; }
+  .planets-container { left: 38px; }
+  .logo-text { font-size: 10px; letter-spacing: 0.8px; }
+}
+
+
+.logo-sun,
+.logo-sun-fixed {
+  position: absolute;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 35% 35%, rgba(255, 248, 190, 0.98) 0%, rgba(255, 217, 92, 0.96) 22%, rgba(255, 150, 24, 0.92) 52%, rgba(255, 92, 0, 0.82) 72%, rgba(255, 92, 0, 0.10) 100%);
+}
+
+.logo-sun::before,
+.logo-sun-fixed::before {
+  content: "";
+  position: absolute;
+  inset: -18%;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, rgba(255, 210, 72, 0.0) 58%, rgba(255, 210, 72, 0.38) 72%, rgba(255, 120, 0, 0.0) 100%);
+  animation: logoSunPulse 3.2s ease-in-out infinite;
+}
+
+.logo-sun::after,
+.logo-sun-fixed::after {
+  content: "";
+  position: absolute;
+  inset: 14%;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.45), rgba(255,255,255,0.0) 30%),
+    radial-gradient(circle at 70% 70%, rgba(255, 120, 0, 0.24), rgba(255, 120, 0, 0.0) 52%);
+  mix-blend-mode: screen;
+  animation: logoSunShimmer 5.4s linear infinite;
+}
+
+@keyframes logoSunPulse {
+  0%, 100% { transform: scale(0.96); opacity: 0.72; }
+  50% { transform: scale(1.06); opacity: 1; }
+}
+
+@keyframes logoSunShimmer {
+  0% { transform: rotate(0deg) scale(1); opacity: 0.72; }
+  50% { transform: rotate(180deg) scale(1.04); opacity: 0.96; }
+  100% { transform: rotate(360deg) scale(1); opacity: 0.72; }
+}
+
+
+/* Явный фолбэк для солнца в лого, чтобы оно не терялось на тёмном фоне */
+.logo-container,
+.planets-fixed-inner {
+  position: relative;
+}
+
+.logo-sun,
+.logo-sun-fixed {
+  display: block !important;
+  z-index: 2;
+  isolation: isolate;
+  border: 1px solid rgba(255, 196, 64, 0.32);
+  box-shadow:
+    0 0 12px rgba(255, 205, 84, 0.75),
+    0 0 28px rgba(255, 152, 32, 0.52),
+    0 0 52px rgba(255, 92, 0, 0.30);
+}
+
+.planets-container,
+.planets-container-fixed {
+  z-index: 3;
+}
+
+.logo-sun::before,
+.logo-sun-fixed::before {
+  inset: -24%;
+  opacity: 0.95;
+}
+
+.logo-sun::after,
+.logo-sun-fixed::after {
+  inset: 12%;
+  opacity: 0.96;
+}
+
+
+/* ===== Горячее исправление: делаем солнце в логотипе ярким и заметным ===== */
+.logo-container,
+.planets-fixed-inner {
+  overflow: visible;
+}
+
+.logo-sun,
+.logo-sun-fixed {
+  z-index: 3;
+  pointer-events: none;
+  box-shadow:
+    0 0 18px rgba(255, 200, 70, 0.55),
+    0 0 34px rgba(255, 145, 0, 0.42),
+    0 0 60px rgba(255, 90, 0, 0.22);
+  animation: logoSunCorePulse 3.6s ease-in-out infinite;
+}
+
+.logo-sun {
+  width: 76px;
+  height: 76px;
+}
+
+.logo-sun-fixed {
+  width: 48px;
+  height: 48px;
+}
+
+.logo-sun::before,
+.logo-sun-fixed::before {
+  inset: -22%;
+  opacity: 0.95;
+}
+
+.logo-sun::after,
+.logo-sun-fixed::after {
+  inset: 10%;
+  opacity: 0.95;
+}
+
+.planets-container,
+.planets-container-fixed {
+  z-index: 4;
+}
+
+@keyframes logoSunCorePulse {
+  0%, 100% {
+    transform: translateY(-50%) scale(0.98);
+    filter: saturate(1);
+  }
+  50% {
+    transform: translateY(-50%) scale(1.04);
+    filter: saturate(1.12);
+  }
+}
+
+
+/* Анимированное солнце логотипа */
+.logo-sun,
+.logo-sun-fixed {
+  background-image: url("/static/images/logo-sun.gif") !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+}

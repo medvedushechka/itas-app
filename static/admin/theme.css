@@ -1,0 +1,216 @@
+:root{
+  --bg0:#070b14;
+  --bg1:#0b1326;
+  --bg2:#0e1b2f;
+  --card:#0b1628cc;
+  --stroke:#ffffff1a;
+  --text:#e9f0ff;
+  --muted:#a9b7d3;
+  --accent:#6aa9ff;
+  --danger:#ff5c7a;
+  --shadow: 0 18px 60px rgba(0,0,0,.45);
+  --radius: 14px;
+}
+
+body{
+  background:
+    radial-gradient(1200px 700px at 15% 10%, #1a2b55 0%, transparent 55%),
+    radial-gradient(900px 600px at 80% 35%, #0d3b3a 0%, transparent 55%),
+    linear-gradient(135deg, var(--bg0), var(--bg2));
+  color: var(--text);
+}
+
+.navbar, .navbar-default, .navbar-inverse{
+  background: linear-gradient(180deg, #0b1326, #081020) !important;
+  border: 1px solid var(--stroke) !important;
+  box-shadow: var(--shadow);
+}
+
+.navbar a, .navbar-brand{ color: var(--text) !important; }
+.navbar .nav > li > a{ color: var(--muted) !important; }
+.navbar .nav > li > a:hover{ color: var(--text) !important; }
+
+.container, .container-fluid{
+  padding-top: 18px;
+}
+
+.table{
+  color: var(--text);
+}
+.table thead th{
+  border-bottom: 1px solid var(--stroke);
+}
+.table td, .table th{
+  border-top: 1px solid var(--stroke) !important;
+}
+.table-hover tbody tr:hover{
+  background: rgba(255,255,255,0.06) !important;
+  color: var(--text) !important;
+}
+
+.form-control, select, textarea, input{
+  background: rgba(10,18,35,.65) !important;
+  border: 1px solid var(--stroke) !important;
+  color: var(--text) !important;
+  border-radius: 12px !important;
+}
+
+.btn{
+  border-radius: 12px !important;
+}
+.btn-primary{
+  background: linear-gradient(180deg, #5b9bff, #2f6fe6) !important;
+  border: none !important;
+}
+.btn-danger{
+  background: linear-gradient(180deg, #ff6b86, #e43b5d) !important;
+  border: none !important;
+}
+.btn-secondary, .btn-default{
+  background: rgba(255,255,255,0.08) !important;
+  border: 1px solid var(--stroke) !important;
+  color: var(--text) !important;
+}
+
+.model-list .search, .navbar-form, .fa-search, .input-group{
+  display:none !important;
+}
+
+/* Главная страница админки */
+.itas-dashboard{
+  background: rgba(0,0,0,0.08);
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius);
+  padding: 18px;
+  box-shadow: var(--shadow);
+}
+
+.itas-dashboard__header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  margin-bottom: 14px;
+}
+
+.itas-dashboard__title{
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: .2px;
+}
+
+.itas-dashboard__subtitle{
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.itas-cards{
+  display:grid;
+  grid-template-columns: repeat(4, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+@media (max-width: 1100px){
+  .itas-cards{ grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 650px){
+  .itas-cards{ grid-template-columns: 1fr; }
+}
+
+.itas-card{
+  display:block;
+  text-decoration:none !important;
+  background: var(--card);
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius);
+  padding: 14px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.30);
+  transition: transform .12s ease, border-color .12s ease, background .12s ease;
+}
+
+.itas-card:hover{
+  transform: translateY(-2px);
+  border-color: rgba(106,169,255,.45);
+  background: rgba(12,22,45,.78);
+}
+
+.itas-card__kpi{
+  font-weight: 800;
+  color: var(--accent);
+  letter-spacing: .6px;
+  font-size: 12px;
+}
+
+.itas-card__name{
+  margin-top: 6px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.itas-card__desc{
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* Страница входа */
+.itas-auth{
+  min-height: 100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding: 24px;
+}
+
+.itas-auth__card{
+  width: min(420px, 100%);
+  background: rgba(10,18,35,.65);
+  border: 1px solid var(--stroke);
+  border-radius: 18px;
+  padding: 18px;
+  box-shadow: var(--shadow);
+}
+
+.itas-auth__title{
+  font-size: 20px;
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+
+.itas-auth__label{
+  display:block;
+  margin-top: 10px;
+  margin-bottom: 6px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.itas-auth__input{
+  width: 100%;
+  padding: 10px 12px;
+}
+
+.itas-auth__btn{
+  width: 100%;
+  margin-top: 14px;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 12px;
+  cursor:pointer;
+  color: #061022;
+  font-weight: 800;
+  background: linear-gradient(180deg, #5b9bff, #2f6fe6);
+}
+
+.itas-auth__flash{
+  margin-top: 10px;
+}
+.itas-auth__flash-item{
+  background: rgba(255,92,122,0.16);
+  border: 1px solid rgba(255,92,122,0.35);
+  color: var(--text);
+  padding: 10px 12px;
+  border-radius: 12px;
+}

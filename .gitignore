@@ -1,56 +1,69 @@
+# Локальная конфигурация и секреты
+.env
+.env.*
+!.env.example
+.flaskenv
+secrets.py
+config_secret.py
+
+# Виртуальные окружения
+.venv/
+venv/
+env/
+ENV/
+
 # Python
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
-venv/
-env/
-ENV/
-.env
-.venv
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
 
-# Flask
+# Базы данных и резервные копии
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+*.bak
+*.backup
+
+# Рабочие загрузки. Стартовые файлы хранятся в static/seed_media.
+static/uploads/*
+!static/uploads/.gitkeep
+
+# Логи и временные файлы
+*.log
+*.tmp
+*.temp
+.cache/
+tmp/
 instance/
-.webassets-cache
-.flaskenv
+.webassets-cache/
 
-# Node
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+# Сборка
+build/
+dist/
+*.egg-info/
 
-# IDE
+# Редакторы
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
+
+# Операционная система
 .DS_Store
 Thumbs.db
+Desktop.ini
 
-# OS
-*.log
-*.sqlite
-*.sqlite3
-
-# Static files (если собираетесь использовать сборщик)
-/dist/
-/build/
-
-# Временные файлы
-*.tmp
-*.temp
-
-# Конфигурационные файлы с чувствительными данными
-secrets.py
-config_secret.py
-
-# Базы данных
-*.db
-*.db-journal
-
-# Кэш
-.cache/
-.pytest_cache/
+# Локальные отчёты обслуживания
+CLEANUP_REPORT.json
+MEDIA_OPTIMIZATION_REPORT.json
+DEVELOPMENT_REPORT*.md

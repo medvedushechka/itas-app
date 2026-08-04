@@ -1,669 +1,798 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Association</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Leaflet CSS для карты -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-          crossorigin=""/>
-    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
-</head>
-<body>
-    <!-- Mobile Menu Overlay -->
-    <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="csrf-token" content="{{ csrf_token() }}" />
+  <title>HTDI</title>
 
-    <!-- Header -->
-    <header>
-        <div class="header-container">
-            <!-- Logo -->
-            <div class="logo-container">
-                <span class="logo-text">IT</span>
-                <img src="{{ url_for('static', filename='images/logo-star.gif') }}" alt="Star Animation" class="logo-gif">
-                <span class="logo-text">ASSOCIATION</span>
-            </div>
+  <link rel="stylesheet" href="/static/css/ticker.css?v=4" />
+  <link rel="stylesheet" href="/static/css/styles.css?v=4" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-            <!-- Mobile Menu Button -->
-            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Меню">
-                <div class="menu-icon"></div>
-            </button>
+  <!-- Стили Leaflet для карты -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin="" />
 
-            <!-- Desktop Navigation -->
-            <nav class="desktop-nav">
-                <ul>
-                    <li class="nav-item"><span>О форуме</span></li>
-                    <li class="nav-item"><span>Спикеры</span></li>
-                    <li class="nav-item"><span>Партнёры</span></li>
-                    <li class="nav-item"><span>Программа</span></li>
-                    <li class="nav-item"><span>Контакты</span></li>
-                </ul>
-            </nav>
+  <link rel="icon" type="image/png" href="/static/images/favicon.png" />
 
-            <!-- Social & Sponsor -->
-            <div class="social-sponsor-container">
-                <div class="social-icons">
-                    <a href="https://web.telegram.org/" target="_blank" class="social-icon telegram-icon" aria-label="Telegram">
-                        <i class="fab fa-telegram-plane"></i>
-                    </a>
-                    <a href="https://www.instagram.com/" target="_blank" class="social-icon instagram-icon" aria-label="Instagram">
-                        <i class="fab fa-instagram"></i>
-                    </a>
-                </div>
-                <button class="sponsor-btn">
-                    <div class="btn-content">
-                        <span>Стать спонсором</span>
-                        <div class="pulse-container">
-                            <div class="pulse-circle pulse-white"></div>
-                            <div class="pulse-circle pulse-blue"></div>
-                        </div>
-                    </div>
-                </button>
-            </div>
+  <!-- Локальные стили ТОЛЬКО для модуля-дерева -->
+  <style>
+    .directions-tree {
+      position: relative;
+      margin-top: 35px;
+      background: rgba(0,0,0,0);
+      overflow: hidden;
+      padding: 34px 20px;
+    }
+    .directions-tree__inner {
+      position: relative;
+      max-width: 1100px;
+      margin: 0 auto;
+      min-height: 520px;
+    }
+    .directions-tree__svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      opacity: 0.9;
+      filter: drop-shadow(0 0 18px rgba(0,170,255,0.20));
+    }
+    .node {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 16px 18px;
+      border-radius: 18px;
+      border: 1px solid rgba(0,170,255,0.22);
+      background: rgba(0, 10, 30, 0.70);
+      backdrop-filter: blur(2px);
+      max-width: 300px;
+      box-shadow: 0 10px 26px rgba(0,0,0,0.35);
+    }
+    .node__title {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 800;
+      letter-spacing: 0.7px;
+      text-transform: uppercase;
+      line-height: 1.2;
+    }
+    .node__desc {
+      color: rgba(170,221,255,0.92);
+      line-height: 1.55;
+      font-size: 0.95rem;
+    }
+    .node--core {
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%,-50%);
+      border-color: rgba(255,51,102,0.35);
+      background: rgba(0,0,0,0.65);
+    }
+    .node--core .node__title { color: #ff3366; }
+    .node--core .node__desc { color: rgba(255,255,255,0.9); }
+
+    .n1 { left: 5%;  top: 10%; }
+    .n2 { left: 70%; top: 10%; }
+    .n3 { left: 78%; top: 38%; }
+    .n4 { left: 70%; top: 66%; }
+    .n5 { left: 8%;  top: 68%; }
+    .n6 { left: 2%;  top: 38%; }
+    .n7 { left: 38%; top: 6%;  }
+
+    @media (max-width: 992px) {
+      .directions-tree__inner { min-height: 980px; }
+      .node { position: relative; left: auto; top: auto; transform: none; width: 100%; max-width: 760px; margin: 0 auto 14px; }
+      .node--core { margin: 0 auto 18px; }
+      .directions-tree__svg { display: none; }
+    }
+   </style>
+  </head>
+<!-- Модальное окно обратной связи -->
+<div class="contact-modal" id="contactModal" aria-hidden="true">
+  <div class="contact-modal__backdrop" data-close></div>
+
+  <div class="contact-modal__card" role="dialog" aria-modal="true" aria-labelledby="contactTitle">
+    <button class="contact-modal__close" type="button" data-close aria-label="Закрыть">×</button>
+
+    <div class="contact-modal__head">
+      <div class="contact-modal__title" id="contactTitle">Написать в Ассоциацию</div>
+      <div class="contact-modal__subtitle">Сообщение будет отправлено на почту Ассоциации.</div>
+    </div>
+
+    <form class="contact-form" id="contactForm">
+      <input name="company" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" class="contact-honeypot">
+      <div class="contact-grid">
+        <label class="contact-field">
+          <span>Имя</span>
+          <input name="name" type="text" autocomplete="name" maxlength="120" placeholder="Ваше имя">
+        </label>
+
+        <label class="contact-field">
+          <span>Email для ответа</span>
+          <input name="email" type="email" autocomplete="email" maxlength="200" placeholder="you@example.com">
+        </label>
+      </div>
+
+      <label class="contact-field">
+        <span>Тема</span>
+        <input name="subject" type="text" maxlength="200" placeholder="Тема письма">
+      </label>
+
+      <label class="contact-field">
+        <span>Сообщение</span>
+        <textarea name="message" rows="6" maxlength="5000" placeholder="Напишите сообщение..." required></textarea>
+      </label>
+
+      <div class="contact-actions">
+        <button class="contact-btn" type="submit">Отправить</button>
+        <div class="contact-status" id="contactStatus" aria-live="polite"></div>
+      </div>
+    </form>
+  </div>
+</div>
+<body class="cursor-hidden">
+  <!-- Фон (звёзды + пятна) -->
+  <div class="stars-container" aria-hidden="true"></div>
+  <div class="background-elements" aria-hidden="true"></div>
+
+  <!-- Затемнение мобильного меню -->
+  <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+
+  <!-- Ракета-курсор -->
+  <div class="rocket-cursor" id="rocketCursor" aria-hidden="true">
+    <div class="rocket-body"></div>
+    <div class="rocket-window"></div>
+    <div class="rocket-flame"></div>
+  </div>
+
+  <!-- Шапка -->
+  <header id="siteHeader">
+    <div class="header-container">
+      <!-- Compact Logo (показывается только при скролле) -->
+      <div class="planets-fixed-container" id="fixedPlanetsContainer" aria-hidden="true">
+        <div class="planets-fixed-inner">
+          <img src="/static/images/logo-sun.gif" class="logo-gif-fixed" alt="Sun" />
+          <div class="planets-container-fixed">
+            <span class="logo-text-fixed" data-planet="1">АССОЦИАЦИЯ</span>
+            <span class="logo-text-fixed" data-planet="2">ВЫСОКИХ</span>
+            <span class="logo-text-fixed" data-planet="3">ТЕХНОЛОГИЙ</span>
+            <span class="logo-text-fixed" data-planet="4">И</span>
+            <span class="logo-text-fixed" data-planet="5">ЦИФРОВОЙ</span>
+            <span class="logo-text-fixed" data-planet="6">ИНФРАСТРУКТУРЫ</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Big Logo (показывается вверху страницы, прячется при скролле) -->
+      <div class="logo-wrapper" id="mainLogo">
+        <div class="logo-container">
+          <img src="/static/images/logo-sun.gif" class="logo-gif" alt="Sun" />
+          <div class="planets-container">
+            <span class="logo-text" data-planet="1">АССОЦИАЦИЯ</span>
+            <span class="logo-text" data-planet="2">ВЫСОКИХ</span>
+            <span class="logo-text" data-planet="3">ТЕХНОЛОГИЙ</span>
+            <span class="logo-text" data-planet="4">И</span>
+            <span class="logo-text" data-planet="5">ЦИФРОВОЙ</span>
+            <span class="logo-text" data-planet="6">ИНФРАСТРУКТУРЫ</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Навигация для компьютеров -->
+      <nav class="desktop-nav" aria-label="Навигация">
+        <ul>
+          <li class="nav-item"><a class="nav-link" href="#about"><span>О нас</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="#goals"><span>Цели</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="#committees"><span>Комитеты</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="#membership"><span>Членство</span></a></li>
+
+          <!-- ДОБАВЛЕНО: Участники -->
+          <li class="nav-item"><a class="nav-link" href="#members"><span>Участники</span></a></li>
+
+          <!-- ДОБАВЛЕНО: Новости -->
+          <li class="nav-item"><a class="nav-link" href="javascript:void(0)" data-news-link><span>Новости</span></a></li>
+
+          <li class="nav-item"><a class="nav-link" href="#contacts"><span>Контакты</span></a></li>
+        </ul>
+      </nav>
+
+      <!-- Социальные ссылки и основное действие -->
+      <div class="social-sponsor-container">
+        <div class="social-icons">
+          <a href="https://www.linkedin.com/in/%D0%B0%D0%BB%D0%B5%D0%BA%D1%81%D0%B5%D0%B9-%D1%81-3542b2164/" target="_blank" aria-label="Linkedin">
+              <i class="fab fa-linkedin"></i>
+          </a>
         </div>
 
-        <!-- Mobile Navigation -->
-        <nav class="mobile-nav" id="mobileNav">
-            <div class="mobile-nav-header">
-                <div class="mobile-logo">ASSOCIATION</div>
-                <button class="mobile-close-btn" id="mobileCloseBtn" aria-label="Закрыть">
-                    <i class="fas fa-times"></i>
-                </button>
+        <a href="#membership" class="sponsor-btn" role="button" aria-label="Вступить">
+          <div class="btn-content">
+            <span>Вступить</span>
+            <div class="pulse-container">
+              <div class="pulse-circle pulse-white"></div>
+              <div class="pulse-circle pulse-blue"></div>
             </div>
-            <ul>
-                <li><a href="#about">О форуме</a></li>
-                <li><a href="#speakers">Спикеры</a></li>
-                <li><a href="#program">Программа</a></li>
-                <li><a href="#partners">Партнёры</a></li>
-                <li><a href="#tariffs">Билеты</a></li>
-                <li><a href="#audience">Аудитория</a></li>
-                <li><a href="#contacts">Контакты</a></li>
-            </ul>
-            <div class="mobile-social">
-                <a href="https://web.telegram.org/" target="_blank" class="mobile-social-icon">
-                    <i class="fab fa-telegram-plane"></i>
-                </a>
-                <a href="https://www.instagram.com/" target="_blank" class="mobile-social-icon">
-                    <i class="fab fa-instagram"></i>
-                </a>
-            </div>
-        </nav>
-    </header>
+          </div>
+        </a>
+      </div>
 
-    <!-- Hero Section -->
-    <section class="hero" id="about">
-        <div class="hero-content">
-            <h1>ASSOCIATION <span class="hero-year">2K26</span></h1>
-            <p class="hero-subtitle">АССОЦИАЦИЯ ПО РАБОТЕ С IT ИНДУСТРИЕЙ</p>
-            <div class="hero-details">
-                <div class="detail-item">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <span>г. Минск, ул. Академика Купревича 1к.2</span>
-                </div>
-                <div class="detail-item">
-                    <i class="fas fa-calendar-alt"></i>
-                    <span>январь 2026</span>
-                </div>
-                <div class="detail-item">
-                    <i class="fas fa-hotel"></i>
-                    <span>Офис Niva Motor</span>
-                </div>
-            </div>
-            <div class="hero-buttons">
-                <button class="buy-ticket">
-                    <i class="fas fa-ticket-alt"></i>
-                    Купить билет
-                </button>
-                <a href="#program" class="program-btn">
-                    <i class="fas fa-calendar"></i>
-                    Программа
-                </a>
-            </div>
-            
-            <!-- Статистика ПОД кнопками -->
-            <div class="hero-stats">
-                <div class="stat-item">
-                    <div class="stat-number">2000+</div>
-                    <div class="stat-label">Участников</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">30+</div>
-                    <div class="stat-label">Спикеры</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">100+</div>
-                    <div class="stat-label">Компании</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">20</div>
-                    <div class="stat-label">Стенды</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">30+</div>
-                    <div class="stat-label">СМИ</div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="hero-visual">
-            <!-- Слайдер с 3 гифками -->
-            <div class="hero-slider" id="heroSlider">
-                <div class="slide active">
-                    <img src="{{ url_for('static', filename='images/hero-gif1.gif') }}" alt="IT Forum Animation 1" class="hero-image" onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/hero-main.jpg') }}'">
-                </div>
-                <div class="slide">
-                    <img src="{{ url_for('static', filename='images/hero-gif2.gif') }}" alt="IT Forum Animation 2" class="hero-image" onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/hero-main.jpg') }}'">
-                </div>
-                <div class="slide">
-                    <img src="{{ url_for('static', filename='images/hero-gif3.gif') }}" alt="IT Forum Animation 3" class="hero-image" onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/hero-main.jpg') }}'">
-                </div>
-                <div class="slider-dots">
-                    <span class="dot active" data-slide="0"></span>
-                    <span class="dot" data-slide="1"></span>
-                    <span class="dot" data-slide="2"></span>
-                </div>
-            </div>
-        </div>
-    </section>
+      <!-- Кнопка мобильного меню -->
+      <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Меню">
+        <div class="menu-icon"></div>
+      </button>
+    </div>
 
-    <!-- Forum Features -->
-    <section class="forum-features">
-        <div class="section-header">
-            <h2>АССОЦИАЦИЯ — ЭТО БОЛЬШЕ, ЧЕМ ПРОСТО ОФИС</h2>
-            <p class="section-subtitle">АССОЦИАЦИЯ - место, где рождаются идеи будущего. Здесь встречаются лидеры отрасли, визионеры и те, кто хочет изменить мир технологий.</p>
-        </div>
-        
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-chalkboard-teacher"></i>
-                </div>
-                <h3>Выступления лидеров</h3>
-                <p>Реальный опыт и тренды из первых уст от практиков индустрии</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-hands-helping"></i>
-                </div>
-                <h3>Мастер-классы</h3>
-                <p>Практические инструменты и новые навыки для профессионального роста</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-users"></i>
-                </div>
-                <h3>Панельные дискуссии</h3>
-                <p>Горячие темы и разные точки зрения на будущее технологий</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-network-wired"></i>
-                </div>
-                <h3>Нетворкинг</h3>
-                <p>Знакомства, которые превращаются в проекты и партнёрства</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-rocket"></i>
-                </div>
-                <h3>Экспо-зона</h3>
-                <p>Новейшие IT-решения и технологии от лидеров рынка</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-lightbulb"></i>
-                </div>
-                <h3>Питч-сессии</h3>
-                <p>Идеи и проекты, способные задать тренды в индустрии</p>
-            </div>
-        </div>
-    </section>
+    <!-- Мобильная навигация -->
+    <nav class="mobile-nav" id="mobileNav" aria-label="Мобильная навигация">
+      <div class="mobile-nav-header">
+        <div class="mobile-logo">HTDI</div>
+        <button class="mobile-close-btn" id="mobileCloseBtn" aria-label="Закрыть">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
 
-    <!-- Key Topics -->
-    <section class="key-topics" id="program">
-        <div class="section-header">
-            <h2>КЛЮЧЕВЫЕ ТЕМЫ АССОЦИАЦИИ</h2>
-            <p class="section-subtitle">Самые актуальные направления в IT и смежных областях. Каждая секция — это возможность услышать экспертов, обсудить тренды и получить практические кейсы.</p>
-        </div>
-        
-        <div class="topics-carousel-container">
-            <!-- Убраны стрелки карусели -->
-            <div class="topics-carousel">
-                <div class="topic-card">
-                    <div class="topic-number">01</div>
-                    <h3>ИСКУССТВЕННЫЙ ИНТЕЛЛЕКТ И МАШИННОЕ ОБУЧЕНИЕ</h3>
-                    <ul>
-                        <li>Генеративный ИИ в бизнесе: реальные кейсы</li>
-                        <li>Интеграция LLM в продукты и сервисы</li>
-                        <li>Автоматизация процессов с помощью ИИ</li>
-                        <li>Этические и правовые вызовы внедрения ИИ</li>
-                    </ul>
-                    <div class="topic-tag">AI/ML</div>
-                    <!-- Контейнер для анимированных кружков -->
-                    <div class="circles-container"></div>
-                </div>
-                
-                <div class="topic-card">
-                    <div class="topic-number">02</div>
-                    <h3>СОВРЕМЕННЫЕ ТЕХНОЛОГИИ В РАЗРАБОТКЕ ПО</h3>
-                    <ul>
-                        <li>Новые тренды в backend, frontend и mobile-разработке</li>
-                        <li>Популярные стеки: FullStack, .NET, Java, Python, Node.js, Ruby, Go</li>
-                        <li>Микросервисы и контейнеризация (Docker, Kubernetes)</li>
-                        <li>Low-code / No-code: будущее цифровой трансформации</li>
-                    </ul>
-                    <div class="topic-tag">Development</div>
-                    <div class="circles-container"></div>
-                </div>
-                
-                <div class="topic-card">
-                    <div class="topic-number">03</div>
-                    <h3>ДИЗАЙН И UX/UI</h3>
-                    <ul>
-                        <li>Эволюция UX/UI: от Figma до AI-инструментов</li>
-                        <li>Адаптивный и кроссплатформенный дизайн</li>
-                        <li>Как интерфейс влияет на вовлечённость</li>
-                        <li>Аналитика поведения аудитории</li>
-                    </ul>
-                    <div class="topic-tag">Design</div>
-                    <div class="circles-container"></div>
-                </div>
-                
-                <div class="topic-card">
-                    <div class="topic-number">04</div>
-                    <h3>КИБЕРБЕЗОПАСНОСТЬ И ЗАЩИТА ДАННЫХ</h3>
-                    <ul>
-                        <li>Современные угрозы и методы защиты</li>
-                        <li>Zero Trust Architecture</li>
-                        <li>Управление рисками (GDPR, ISO 27001)</li>
-                        <li>Обнаружение и реагирование на инциденты</li>
-                    </ul>
-                    <div class="topic-tag">Security</div>
-                    <div class="circles-container"></div>
-                </div>
-                
-                <div class="topic-card">
-                    <div class="topic-number">05</div>
-                    <h3>СТРАТЕГИИ МАСШТАБИРОВАНИЯ</h3>
-                    <ul>
-                        <li>Баланс между ростом и качеством</li>
-                        <li>Agile, Scrum и OKR в масштабировании</li>
-                        <li>Управление распределёнными командами</li>
-                        <li>Выход на международные рынки</li>
-                    </ul>
-                    <div class="topic-tag">Growth</div>
-                    <div class="circles-container"></div>
-                </div>
-                
-                <div class="topic-card">
-                    <div class="topic-number">06</div>
-                    <h3>ПРОДАЖИ И ПРОДВИЖЕНИЕ IT-РЕШЕНИЙ</h3>
-                    <ul>
-                        <li>B2B и B2C стратегии продаж</li>
-                        <li>Создание эффективных предложений</li>
-                        <li>Работа с возражениями клиентов</li>
-                        <li>Кейсы успешных долгосрочных партнёрств</li>
-                    </ul>
-                    <div class="topic-tag">Sales</div>
-                    <div class="circles-container"></div>
-                </div>
-            </div>
-        </div>
-    </section>
+      <ul>
+        <li><a href="#about">О нас</a></li>
+        <li><a href="#goals">Цели</a></li>
+        <li><a href="#committees">Комитеты</a></li>
+        <li><a href="#membership">Членство</a></li>
 
-    <!-- Speakers -->
-    <section class="speakers" id="speakers">
-        <div class="section-header">
-            <h2>СБОРНАЯ ASSOCIATION</h2>
-            <p class="section-subtitle">Лучшие эксперты индустрии соберутся на одной сцене, чтобы поделиться опытом, свежими идеями и реальными кейсами. Каждый спикер — практик, который формирует будущее технологий уже сегодня.</p>
-        </div>
-        
-        <div class="speakers-grid">
-            <div class="speaker-card">
-                <div class="speaker-image">
-                    <img src="{{ url_for('static', filename='images/speaker1.jpg') }}" alt="Иван Гриневич" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60'">
-                    <div class="speaker-experience">10+ лет опыта</div>
-                </div>
-                <div class="speaker-info">
-                    <h3>Иван Гриневич</h3>
-                    <p class="speaker-role">Директор PHPDev.ORG</p>
-                    <div class="speaker-tags">
-                        <span class="tag">Management</span>
-                        <span class="tag">Automation</span>
-                        <span class="tag">AI Tools</span>
-                    </div>
-                    <p class="speaker-desc">Эксперт в управлении IT-проектами и автоматизации бизнес-процессов</p>
-                </div>
-            </div>
-            
-            <div class="speaker-card">
-                <div class="speaker-image">
-                    <img src="{{ url_for('static', filename='images/speaker2.jpg') }}" alt="Евгений Подлесной" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60'">
-                    <div class="speaker-experience">7 лет опыта</div>
-                </div>
-                <div class="speaker-info">
-                    <h3>Евгений Подлесной</h3>
-                    <p class="speaker-role">Web Tech Lead</p>
-                    <div class="speaker-tags">
-                        <span class="tag">Web Dev</span>
-                        <span class="tag">Architecture</span>
-                        <span class="tag">Optimization</span>
-                    </div>
-                    <p class="speaker-desc">Специалист по веб-архитектуре и оптимизации высоконагруженных систем</p>
-                </div>
-            </div>
-            
-            <div class="speaker-card">
-                <div class="speaker-image">
-                    <img src="{{ url_for('static', filename='images/speaker3.jpg') }}" alt="Павел Ганарацкий" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60'">
-                    <div class="speaker-experience">10 лет опыта</div>
-                </div>
-                <div class="speaker-info">
-                    <h3>Павел Ганарацкий</h3>
-                    <p class="speaker-role">Автор курса НЕЙРОМОТИВАЦИЯ</p>
-                    <div class="speaker-tags">
-                        <span class="tag">GPT</span>
-                        <span class="tag">Midjourney</span>
-                        <span class="tag">Veo</span>
-                    </div>
-                    <p class="speaker-desc">Эксперт по нейросетям и генеративному искусственному интеллекту</p>
-                </div>
-            </div>
-            
-            <div class="speaker-card">
-                <div class="speaker-image">
-                    <img src="{{ url_for('static', filename='images/speaker4.jpg') }}" alt="Александр Михалькевич" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60'">
-                    <div class="speaker-experience">6+ лет опыта</div>
-                </div>
-                <div class="speaker-info">
-                    <h3>Александр Михалькевич</h3>
-                    <p class="speaker-role">Product Analytics, IDT</p>
-                    <div class="speaker-tags">
-                        <span class="tag">Data Science</span>
-                        <span class="tag">BI</span>
-                        <span class="tag">ML</span>
-                    </div>
-                    <p class="speaker-desc">Специалист по аналитике продуктов и машинному обучению</p>
-                </div>
-            </div>
-        </div>
-        
-        <div class="speakers-cta">
-            <p>И ещё 26+ экспертов готовы поделиться своим опытом</p>
-            <button class="view-all-speakers">
-                <i class="fas fa-user-friends"></i>
-                Смотреть всех спикеров
-            </button>
-        </div>
-    </section>
+        <!-- ДОБАВЛЕНО: Участники -->
+        <li><a href="#members">Участники</a></li>
 
-    <!-- Participation Options -->
-    <section class="participation-options" id="tariffs">
-        <div class="section-header">
-            <h2>ВАРИАНТЫ УЧАСТИЯ</h2>
-            <p class="section-subtitle">Выберите формат, который подходит именно вам. Все билеты дают доступ к форуму, а дополнительные опции помогут получить максимум пользы и комфорта.</p>
-        </div>
-        
-        <div class="tariffs-grid">
-            <div class="tariff-card light">
-                <div class="tariff-badge">Популярный</div>
-                <div class="tariff-icon">
-                    <i class="fas fa-star"></i>
-                </div>
-                <h3>ТАРИФ LIGHT</h3>
-                <div class="tariff-description">
-                    <h4>Что входит в тариф</h4>
-                    <ul class="tariff-features">
-                        <li><i class="fas fa-check"></i> Доступ в экспозиту</li>
-                        <li><i class="fas fa-check"></i> Доступ в основной зал (без гарантии места)</li>
-                    </ul>
-                    <div class="tariff-note">
-                        <p>Если важна гарантия посадочного места — обратите внимание на <strong>тариф Business</strong></p>
-                        <p>Всем подписчикам ITNEWS.pro скидка 10% по промокоду <strong>ITN10</strong></p>
-                    </div>
-                </div>
-                <div class="tariff-price">50 BYN</div>
-                <div class="tariff-month">Март 2026</div>
-                <button class="tariff-btn">
-                    <i class="fas fa-ticket-alt"></i>
-                    Купить билет
-                </button>
-            </div>
-            
-            <div class="tariff-card business">
-                <div class="tariff-badge">Рекомендуем</div>
-                <div class="tariff-icon">
-                    <i class="fas fa-briefcase"></i>
-                </div>
-                <h3>ТАРИФ BUSINESS</h3>
-                <div class="tariff-description">
-                    <h4>Что входит в тариф</h4>
-                    <ul class="tariff-features">
-                        <li><i class="fas fa-check"></i> Доступ в экспозиту</li>
-                        <li><i class="fas fa-check"></i> Доступ в основной зал с гарантией места</li>
-                        <li><i class="fas fa-check"></i> Браслет и бейдж Business</li>
-                        <li><i class="fas fa-check"></i> Презентации спикеров</li>
-                    </ul>
-                    <div class="tariff-note">
-                        <p>Всем подписчикам ITNEWS.pro скидка 20% по промокоду <strong>ITN20</strong></p>
-                    </div>
-                </div>
-                <div class="tariff-price">180 BYN</div>
-                <div class="tariff-month">
-                    <strong>Март 2026</strong>
-                    <div class="tariff-choice">
-                        <i class="fas fa-users"></i>
-                        Выбор участников
-                    </div>
-                </div>
-                <button class="tariff-btn">
-                    <i class="fas fa-ticket-alt"></i>
-                    Купить билет
-                </button>
-            </div>
-            
-            <div class="tariff-card vip">
-                <div class="tariff-badge">VIP</div>
-                <div class="tariff-icon">
-                    <i class="fas fa-crown"></i>
-                </div>
-                <h3>ТАРИФ VIP</h3>
-                <div class="tariff-description">
-                    <h4>Что входит в тариф</h4>
-                    <ul class="tariff-features">
-                        <li><i class="fas fa-check"></i> Доступ в экспозиту</li>
-                        <li><i class="fas fa-check"></i> Доступ в основной зал с гарантией посадочного места в первом секторе</li>
-                        <li><i class="fas fa-check"></i> Браслет и бейдж VIP</li>
-                        <li><i class="fas fa-check"></i> Доступ в VIP-комнату на кофе-паузы</li>
-                        <li><i class="fas fa-check"></i> Презентации спикеров</li>
-                    </ul>
-                    <div class="tariff-note">
-                        <p>Всем подписчикам ITNEWS.pro скидка 20% по промокоду <strong>ITN20</strong></p>
-                    </div>
-                </div>
-                <div class="tariff-price">290 BYN</div>
-                <button class="tariff-btn">
-                    <i class="fas fa-ticket-alt"></i>
-                    Купить билет
-                </button>
-            </div>
-        </div>
-    </section>
+        <!-- ДОБАВЛЕНО: Новости -->
+        <li><a href="javascript:void(0)" data-news-link>Новости</a></li>
 
-    <!-- Target Audience -->
-    <section class="target-audience" id="audience">
-        <div class="section-header">
-            <h2>ДЛЯ КОГО АССОЦИАЦИЯ</h2>
-            <p class="section-subtitle">Форум объединяет всех участников IT-экосистемы — от разработчиков и дизайнеров до инвесторов и представителей государства. Здесь каждый найдёт знания, контакты и возможности для развития.</p>
-        </div>
-        
-        <div class="audience-cards">
-            <div class="audience-card">
-                <div class="audience-header">
-                    <div class="audience-number">01</div>
-                    <h3>IT-СПЕЦИАЛИСТЫ</h3>
-                </div>
-                <ul class="audience-list">
-                    <li>Разработчики, архитекторы, DevOps, QA</li>
-                    <li>Дизайнеры и специалисты UX/UI</li>
-                    <li>HR и рекрутеры в сфере IT</li>
-                    <li>Эксперты по ИИ, Data Science, кибербезопасности</li>
-                </ul>
-                <button class="audience-btn">
-                    <i class="fas fa-user-plus"></i>
-                    Стать участником
-                </button>
-            </div>
-            
-            <div class="audience-card">
-                <div class="audience-header">
-                    <div class="audience-number">02</div>
-                    <h3>БИЗНЕС И УПРАВЛЕНИЕ</h3>
-                </div>
-                <ul class="audience-list">
-                    <li>Маркетологи и менеджеры по продажам</li>
-                    <li>Руководители IT-департаментов, CTO, CEO</li>
-                    <li>Представители заказчиков, корпораций</li>
-                    <li>Партнёры и консультанты (аутсорс, консалтинг)</li>
-                    <li>Стартапы и инвесторы: основатели, бизнес-ангелы, представители акселераторов</li>
-                </ul>
-                <button class="audience-btn">
-                    <i class="fas fa-user-plus"></i>
-                    Стать участником
-                </button>
-            </div>
-            
-            <div class="audience-card">
-                <div class="audience-header">
-                    <div class="audience-number">03</div>
-                    <h3>ГОСУДАРСТВО И ОТРАСЛИ</h3>
-                </div>
-                <ul class="audience-list">
-                    <li>Представители госорганов, регуляторов, цифровых министерств и инновационных агентств</li>
-                    <li>Руководители и эксперты из промышленных предприятий и производственных компаний, которые стремятся к цифровой трансформации:</li>
-                    <li class="sub-item">Машиностроение и энергетика</li>
-                    <li class="sub-item">Тяжёлая и лёгкая промышленность</li>
-                    <li class="sub-item">Логистика и производственные цепочки</li>
-                    <li class="sub-item">«Умные» заводы и Industry 4.0</li>
-                </ul>
-                <button class="audience-btn">
-                    <i class="fas fa-user-plus"></i>
-                    Стать участником
-                </button>
-            </div>
-        </div>
-    </section>
+        <li><a href="#contacts">Контакты</a></li>
+      </ul>
 
-    <!-- Partners -->
-    <section class="partners" id="partners">
-        <div class="section-header">
-            <h2>ПАРТНЁРЫ ФОРУМА</h2>
-            <p class="section-subtitle">АССОЦИАЦИЯ поддерживают лидеры индустрии и ключевые медиаплатформы. Вместе мы формируем сильное IT-сообщество.</p>
+      <a href="#membership" class="sponsor-btn sponsor-btn--mobile" role="button" aria-label="Вступить">
+        <div class="btn-content">
+          <span>Вступить</span>
+          <div class="pulse-container">
+            <div class="pulse-circle pulse-white"></div>
+            <div class="pulse-circle pulse-blue"></div>
+          </div>
         </div>
-        
-        <div class="partners-grid">
-            <div class="partner-category">
-                <h3>Генеральный партнер</h3>
-                <div class="partner-logos">
-                    <div class="partner-logo">
-                        <img src="{{ url_for('static', filename='images/partner-gen.png') }}" alt="Генеральный партнер" onerror="this.onerror=null; this.src='https://via.placeholder.com/200x60/00aaff/ffffff?text=GENERAL+PARTNER'">
-                    </div>
-                </div>
-            </div>
-            
-            <div class="partner-category">
-                <h3>Золотой партнёр</h3>
-                <div class="partner-logos">
-                    <div class="partner-logo">
-                        <img src="{{ url_for('static', filename='images/partner-gold1.png') }}" alt="Золотой партнер 1" onerror="this.onerror=null; this.src='https://via.placeholder.com/180x50/ffd700/000000?text=GOLD+PARTNER+1'">
-                    </div>
-                    <div class="partner-logo">
-                        <img src="{{ url_for('static', filename='images/partner-gold2.png') }}" alt="Золотой партнер 2" onerror="this.onerror=null; this.src='https://via.placeholder.com/180x50/ffd700/000000?text=GOLD+PARTNER+2'">
-                    </div>
-                </div>
-            </div>
-            
-            <div class="partner-category">
-                <h3>Серебряный партнёр</h3>
-                <div class="partner-logos">
-                    <div class="partner-logo">
-                        <img src="{{ url_for('static', filename='images/partner-silver1.png') }}" alt="Серебряный партнер 1" onerror="this.onerror=null; this.src='https://via.placeholder.com/180x50/c0c0c0/000000?text=SILVER+PARTNER+1'">
-                    </div>
-                    <div class="partner-logo">
-                        <img src="{{ url_for('static', filename='images/partner-silver2.png') }}" alt="Серебряный партнер 2" onerror="this.onerror=null; this.src='https://via.placeholder.com/180x50/c0c0c0/000000?text=SILVER+PARTNER+2'">
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="become-partner">
-            <h3>Станьте партнёром АССОЦИАЦИИ</h3>
-            <p>Покажите свой бренд лидерам индустрии</p>
-            <button class="partner-btn">
-                <i class="fas fa-handshake"></i>
-                Стать партнёром
-            </button>
-        </div>
-    </section>
+      </a>
 
-    <!-- Footer -->
-    <footer id="contacts">
-        <div class="footer-content">
-            <div class="footer-section">
-                <h3>ОРГАНИЗАТОР</h3>
-                <div class="org-logo">АССОЦИАЦИЯ</div>
-                <p>ООО «Нива-мотор»</p>
-                <p>УНП 808001460</p>
-            </div>
-            
-            <div class="footer-section">
-                <h3>НАВИГАЦИЯ</h3>
-                <ul>
-                    <li><a href="#about">О форуме</a></li>
-                    <li><a href="#program">Программа</a></li>
-                    <li><a href="#speakers">Спикеры</a></li>
-                    <li><a href="#partners">Партнёры</a></li>
-                    <li><a href="#tariffs">Билеты</a></li>
-                </ul>
-            </div>
-            
-            <div class="footer-section">
-                <h3>КОНТАКТЫ</h3>
-                <p><i class="fas fa-envelope"></i> motor@niva.by</p>
-                <p><i class="fas fa-phone"></i> +375 (173) 55 51 97</p>
-                <p><i class="fas fa-map-marker-alt"></i> г. Минск, ул. Академика Купревича 1, корпус 2</p>
-                <div class="footer-social">
-                    <a href="https://web.telegram.org/" target="_blank"><i class="fab fa-telegram-plane"></i></a>
-                    <a href="https://www.instagram.com/" target="_blank"><i class="fab fa-instagram"></i></a>
-                </div>
-            </div>
-            
-            <div class="footer-section">
-                <h3>РАСПОЛОЖЕНИЕ</h3>
-                <div class="location-map">
-                    <!-- Карта будет вставлена через JavaScript -->
-                    <div id="map"></div>
-                    <div class="map-info">
-                        <p><i class="fas fa-map-marker-alt"></i> г. Минск, ул. Академика Купревича 1, корпус 2</p>
-                        <p><i class="fas fa-subway"></i> Метро: "Восток", "Уручье"</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="footer-bottom">
-            <p>© 2026 ASSOCIATION. Все права защищены.</p>
-        </div>
-    </footer>
+      <div class="mobile-social">
+        <a href="https://web.telegram.org/" target="_blank" class="mobile-social-icon" aria-label="Telegram">
+          <i class="fab fa-telegram-plane"></i>
+        </a>
+        <a href="https://www.instagram.com/" target="_blank" class="mobile-social-icon" aria-label="Instagram">
+          <i class="fab fa-instagram"></i>
+        </a>
+      </div>
+    </nav>
+  </header>
 
-    <!-- Leaflet JS для карты -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-            crossorigin=""></script>
-    
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <!-- ITAS: ticker (под хэдером) -->
+  <div id="itas-ticker" class="itas-ticker">
+    <div class="itas-ticker__fade itas-ticker__fade--left"></div>
+    <div class="itas-ticker__fade itas-ticker__fade--right"></div>
+    <div class="itas-ticker__viewport">
+      <div class="itas-ticker__track"></div>
+    </div>
+  </div>
+
+  <!-- Главный экран -->
+  <section class="hero" id="about">
+    <div class="hero-content">
+      <div class="hero-details">
+        <div class="detail-item">
+          <i class="fas fa-map-marker-alt"></i>
+          <span>220084, г. Минск, ул. Академика Купревича, 1/1</span>
+        </div>
+        <div class="detail-item">
+          <i class="fas fa-handshake"></i>
+          <span>Развитие национальной цифровой экосистемы через сотрудничество, проекты и знания
+</span>
+        </div>
+        <div class="detail-item">
+          <i class="fas fa-globe"></i>
+          <span>www.beltime.by</span>
+        </div>
+      </div>
+
+      <div class="hero-buttons">
+        <a href="#membership" class="program-btn">
+          <i class="fas fa-user-plus"></i>
+          Членство
+        </a>
+        <a href="#committees" class="program-btn">
+          <i class="fas fa-sitemap"></i>
+          Комитеты
+        </a>
+      </div>
+
+      <div class="hero-stats">
+        <div class="stat-item">
+          <div class="stat-number">7</div>
+          <div class="stat-label">Комитетов</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">2025</div>
+          <div class="stat-label">Меморандум ПВТ</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="hero-slider" id="heroSlider">
+        <div class="slide active hero-slide-loading" aria-hidden="true"></div>
+        <div class="slider-dots">
+          <span class="dot active" data-slide="0"></span>
+          <span class="dot" data-slide="1"></span>
+          <span class="dot" data-slide="2"></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Об ассоциации -->
+  <section class="forum-features">
+    <div class="section-header">
+      <h2>ОБ АССОЦИАЦИИ</h2>
+      <p class="section-subtitle">
+        Ассоциация высоких технологий и цифровой инфраструктуры — объединение организаций и предпринимателей.
+        Ассоциация является юридическим лицом и некоммерческой организацией, развивает отраслевую экосистему и
+        представляет интересы участников.
+      </p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fas fa-scale-balanced"></i></div>
+        <h3>Представление и защита</h3>
+        <p>Защита общих и профессиональных интересов членов Ассоциации в органах власти и перед третьими лицами.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fas fa-gavel"></i></div>
+        <h3>Нормотворчество</h3>
+        <p>Участие в совершенствовании законодательства и нормативных актов в сфере ИТ, ЦОД и ИИ.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fas fa-network-wired"></i></div>
+        <h3>Кооперация рынка</h3>
+        <p>Согласование интересов операторов ЦОД, производителей оборудования, проектных и научных организаций.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fas fa-microchip"></i></div>
+        <h3>Инновации</h3>
+        <p>Поддержка проектов в области ИИ, высокопроизводительных вычислений, облаков и цифровых экосистем.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fas fa-shield-halved"></i></div>
+        <h3>Кибербезопасность</h3>
+        <p>Координация усилий по обеспечению кибербезопасности критической цифровой инфраструктуры.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fas fa-graduation-cap"></i></div>
+        <h3>Кадры и знания</h3>
+        <p>Поддержка STEM-образования, повышение квалификации специалистов и развитие исследовательских лабораторий.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Цели -->
+  <section class="key-topics" id="goals">
+    <div class="section-header">
+      <h2>ЦЕЛИ И НАПРАВЛЕНИЯ</h2>
+      <p class="section-subtitle">
+        Основная цель — представление и защита общих (в т.ч. профессиональных) интересов членов Ассоциации
+        для достижения общественно полезных результатов и устойчивого развития цифровой экономики Республики Беларусь.
+      </p>
+    </div>
+
+    <div class="directions-tree">
+      <div class="directions-tree__inner">
+        <svg class="directions-tree__svg" viewBox="0 0 1100 520" preserveAspectRatio="none" aria-hidden="true">
+          <defs>
+            <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#00aaff" stop-opacity="0.75" />
+              <stop offset="1" stop-color="#ff3366" stop-opacity="0.55" />
+            </linearGradient>
+            <filter id="glow">
+              <feGaussianBlur stdDeviation="2.6" result="coloredBlur"/>
+              <feMerge>
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
+
+          <g filter="url(#glow)" stroke="url(#g1)" stroke-width="2.2" fill="none" opacity="0.95">
+            <path d="M550 260 C450 190, 260 140, 140 110" />
+            <path d="M550 260 C660 200, 820 150, 980 110" />
+            <path d="M550 260 C700 250, 900 260, 1040 300" />
+            <path d="M550 260 C680 330, 860 380, 980 410" />
+            <path d="M550 260 C420 340, 260 410, 160 430" />
+            <path d="M550 260 C420 260, 250 290, 110 310" />
+            <path d="M550 260 C520 170, 510 90, 520 50" />
+          </g>
+
+          <g fill="#00aaff" opacity="0.85" filter="url(#glow)">
+            <circle cx="550" cy="260" r="4" />
+            <circle cx="140" cy="110" r="3" />
+            <circle cx="980" cy="110" r="3" />
+            <circle cx="1040" cy="300" r="3" />
+            <circle cx="980" cy="410" r="3" />
+            <circle cx="160" cy="430" r="3" />
+            <circle cx="110" cy="310" r="3" />
+            <circle cx="520" cy="50" r="3" />
+          </g>
+        </svg>
+
+        <div class="node node--core">
+          <div class="node__title">Цифровая экосистема</div>
+          <div class="node__desc">
+            Сотрудничество, проекты и знания для развития отрасли высоких технологий, цифровой инфраструктуры и сервисов.
+          </div>
+        </div>
+
+        <div class="node n1">
+          <div class="node__title" style="color:#00aaff;">ЦОД и облака</div>
+          <div class="node__desc">Развитие центров обработки данных, облачных платформ и инфраструктурных стандартов.</div>
+        </div>
+
+        <div class="node n2">
+          <div class="node__title" style="color:#00aaff;">ПО и платформы</div>
+          <div class="node__desc">Сервисные модели (SaaS/PaaS/IaaS), отечественное ПО, open-source и экспорт решений.</div>
+        </div>
+
+        <div class="node n3">
+          <div class="node__title" style="color:#ff3366;">ИИ и ML</div>
+          <div class="node__desc">Лаборатории ИИ, внедрение решений ИИ/ML и «технологий будущего» в продукты и отрасли.</div>
+        </div>
+
+        <div class="node n4">
+          <div class="node__title" style="color:#ff3366;">Кибербезопасность</div>
+          <div class="node__desc">Защищённые цепочки, безопасность критической инфраструктуры, НИОКР и суверенитет.</div>
+        </div>
+
+        <div class="node n5">
+          <div class="node__title" style="color:#00aaff;">Интеграция и трансформация</div>
+          <div class="node__desc">Консорциумы, консалтинг, оптимизация процессов и масштабирование решений на рынках.</div>
+        </div>
+
+        <div class="node n6">
+          <div class="node__title" style="color:#00aaff;">Кадры и наука</div>
+          <div class="node__desc">STEM-инициативы, HR-консалтинг, повышение квалификации и исследовательские центры.</div>
+        </div>
+
+        <div class="node n7">
+          <div class="node__title" style="color:#ff3366;">Цифровизация строительства</div>
+          <div class="node__desc">BIM, автоматизация управления проектами, «умные города» и цифровые экосистемы.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Комитеты -->
+  <section class="key-topics" id="committees">
+    <div class="section-header">
+      <h2>ПРОФИЛЬНЫЕ КОМИТЕТЫ</h2>
+      <p class="section-subtitle">
+        Деятельность Ассоциации во взаимодействии с Секретариатом Набсовета ПВТ осуществляется через профильные комитеты.
+      </p>
+    </div>
+
+    <div class="topics-carousel-container">
+      <div class="topics-carousel">
+        <div class="topic-card">
+          <div class="topic-number">01</div>
+          <h3>Взаимодействие с госорганами и международное сотрудничество</h3>
+          <ul>
+            <li>Представление инициатив и интересов членов</li>
+            <li>Нормотворчество в ИТ-сфере, ЦОД и ИИ</li>
+            <li>Экспертиза и механизмы поддержки (в т.ч. госзакупки)</li>
+          </ul>
+          <div class="topic-tag">Regulation</div>
+          <div class="circles-container"></div>
+        </div>
+
+        <div class="topic-card">
+          <div class="topic-number">02</div>
+          <h3>Цифровая инфраструктура и ЦОД</h3>
+          <ul>
+            <li>Стандарты проектирования, строительства и эксплуатации</li>
+            <li>Добровольная сертификация инфраструктуры</li>
+            <li>Инновации: HPC, майнинг, облачные платформы</li>
+          </ul>
+          <div class="topic-tag">Data Centers</div>
+          <div class="circles-container"></div>
+        </div>
+
+        <div class="topic-card">
+          <div class="topic-number">03</div>
+          <h3>ПО и цифровые платформы</h3>
+          <ul>
+            <li>SaaS / PaaS / IaaS и внедрение отечественного ПО</li>
+            <li>Open-source и развитие рынка сервисов</li>
+            <li>ИИ/ML, блокчейн, цифровая медицина</li>
+          </ul>
+          <div class="topic-tag">Platforms</div>
+          <div class="circles-container"></div>
+        </div>
+
+        <div class="topic-card">
+          <div class="topic-number">04</div>
+          <h3>Кибербезопасность и технологический суверенитет</h3>
+          <ul>
+            <li>Защищённые технологические цепочки</li>
+            <li>Безопасность критической инфраструктуры</li>
+            <li>НИОКР и лаборатории</li>
+          </ul>
+          <div class="topic-tag">Security</div>
+          <div class="circles-container"></div>
+        </div>
+
+        <div class="topic-card">
+          <div class="topic-number">05</div>
+          <h3>Системная интеграция и цифровая трансформация</h3>
+          <ul>
+            <li>Доступ к стратегическому, финансовому и ИТ-консалтингу</li>
+            <li>Оптимизация бизнес-процессов и оценка рынков</li>
+            <li>Консорциумы и масштабирование проектов</li>
+          </ul>
+          <div class="topic-tag">Transformation</div>
+          <div class="circles-container"></div>
+        </div>
+
+        <div class="topic-card">
+          <div class="topic-number">06</div>
+          <h3>Кадры, образование и наука</h3>
+          <ul>
+            <li>STEM-образование и инженерные профессии</li>
+            <li>HR-консалтинг и повышение квалификации</li>
+            <li>Исследовательские центры и лаборатории ИИ</li>
+          </ul>
+          <div class="topic-tag">Education</div>
+          <div class="circles-container"></div>
+        </div>
+
+        <div class="topic-card">
+          <div class="topic-number">07</div>
+          <h3>Цифровизация в строительстве</h3>
+          <ul>
+            <li>BIM на всех этапах жизненного цикла</li>
+            <li>ПО для управления проектами и автоматизация процессов</li>
+            <li>Умные города и отраслевые экосистемы</li>
+          </ul>
+          <div class="topic-tag">Construction</div>
+          <div class="circles-container"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Вступление в ассоциацию -->
+  <section class="target-audience" id="membership">
+    <div class="section-header">
+      <h2>ЧЛЕНСТВО</h2>
+      <p class="section-subtitle">
+        Членами Ассоциации могут стать коммерческие и некоммерческие организации, а также индивидуальные предприниматели,
+        принимающие цели Ассоциации и способствующие их достижению.
+      </p>
+    </div>
+
+    <div class="audience-cards">
+      <div class="audience-card">
+        <div class="audience-header">
+          <div class="audience-number">01</div>
+          <h3>КТО МОЖЕТ ВСТУПИТЬ</h3>
+        </div>
+        <ul class="audience-list">
+          <li>Коммерческие организации</li>
+          <li>Некоммерческие организации</li>
+          <li>Индивидуальные предприниматели</li>
+          <li class="sub-item">Принимающие цели Ассоциации и поддерживающие их реализацию</li>
+        </ul>
+        <button class="audience-btn" type="button"><i class="fas fa-envelope"></i> Написать в Ассоциацию</button>
+      </div>
+
+      <div class="audience-card">
+        <div class="audience-header">
+          <div class="audience-number">02</div>
+          <h3>ПРАВА ЧЛЕНА</h3>
+        </div>
+        <ul class="audience-list">
+          <li>Участие с правом голоса в общих собраниях</li>
+          <li>Избирать и быть избранным в органы управления</li>
+          <li>Вносить предложения по улучшению деятельности</li>
+          <li>Получать информацию и консультационную помощь</li>
+          <li>Свободно выйти из членов Ассоциации</li>
+        </ul>
+        <button class="audience-btn" type="button"><i class="fas fa-user-plus"></i> Вступить</button>
+      </div>
+
+      <div class="audience-card">
+        <div class="audience-header">
+          <div class="audience-number">03</div>
+          <h3>ОБЯЗАННОСТИ</h3>
+        </div>
+        <ul class="audience-list">
+          <li>Соблюдать устав и решения органов управления</li>
+          <li>Активно содействовать достижению целей</li>
+          <li>Уплачивать членские взносы в установленные сроки</li>
+          <li class="sub-item">Соблюдать конфиденциальность при необходимости</li>
+        </ul>
+        <button class="audience-btn" type="button"><i class="fas fa-file-signature"></i> Запросить условия</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ДОБАВЛЕНО: MEMBERS -->
+  <section class="members-section" id="members">
+    <div class="section-header">
+      <h2>ЧЛЕНЫ АССОЦИАЦИИ</h2>
+      <p class="section-subtitle">
+        Организации и предприниматели, которые поддерживают цели Ассоциации и участвуют в развитии экосистемы.
+      </p>
+    </div>
+
+    <div class="members-wrap">
+      <div class="members-grid" id="membersGrid"></div>
+
+      <div class="members-empty" id="membersEmpty" style="display:none;">
+        <h3>Список участников пока пуст</h3>
+        <p>Добавь членов Ассоциации в админке — и они появятся здесь.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ДОБАВЛЕНО: NEWS (скрытая секция, показываем без перезагрузки) -->
+  <section id="newsSection" style="display:none;">
+    <div class="section-header">
+      <h2>НОВОСТИ АССОЦИАЦИИ</h2>
+      <p class="section-subtitle">
+        Актуальные публикации, события и объявления Ассоциации.
+      </p>
+    </div>
+
+    <div id="newsBig"></div>
+    <div id="newsGrid"></div>
+  </section>
+
+  <!-- Подвал -->
+  <footer id="contacts">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>ОРГАНИЗАЦИЯ</h3>
+        <p>Ассоциация высоких технологий и цифровой инфраструктуры</p>
+        <p>УНП 193924921</p>
+        <!--<p>Председатель: Коневцев Дмитрий Александрович</p>-->
+        <!--<p>Генеральный директор: Свентицкий Алексей Васильевич</p>-->
+      </div>
+
+      <div class="footer-section">
+        <h3>НАВИГАЦИЯ</h3>
+        <ul>
+          <li><a href="#about">О нас</a></li>
+          <li><a href="#goals">Цели</a></li>
+          <li><a href="#committees">Комитеты</a></li>
+          <li><a href="#membership">Членство</a></li>
+
+          <!-- ДОБАВЛЕНО: Участники -->
+          <li><a href="#members">Участники</a></li>
+
+          <li><a href="#contacts">Контакты</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-section">
+        <h3>КОНТАКТЫ</h3>
+        <p><i class="fas fa-phone"></i> +375 (17) 217 53 98</p>
+        <p><i class="fas fa-envelope"></i> info@beltime.by</p>
+        <p><i class="fas fa-map-marker-alt"></i> 220084, г. Минск, ул. Академика Купревича, 1/1</p>
+        <div class="footer-social">
+          <a href="https://www.linkedin.com/in/%D0%B0%D0%BB%D0%B5%D0%BA%D1%81%D0%B5%D0%B9-%D1%81-3542b2164/" target="_blank" aria-label="Linkedin"><i class="fab fa-linkedin"></i></a>
+        </div>
+      </div>
+
+      <div class="footer-section">
+        <h3>РАСПОЛОЖЕНИЕ</h3>
+        <div class="location-map">
+          <div id="map"></div>
+          <div class="map-info">
+            <p><i class="fas fa-map-marker-alt"></i> 220084, г. Минск, ул. Академика Купревича, 1/1</p>
+            <p><i class="fas fa-subway"></i> Метро: "Восток", "Уручье"</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>© 2026 Ассоциации высоких технологий и цифровой инфраструктуры. Все права защищены.</p>
+    </div>
+  </footer>
+
+  <!-- Скрипт Leaflet для карты -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+          integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+          crossorigin=""></script>
+
+  <!-- JS: Порядок важен -->
+  <script src="/static/js/utils.js?v=4"></script>
+  <script src="/static/js/logo-orbit.js?v=4"></script>
+  <script src="/static/js/background.js?v=4"></script>
+  <script src="/static/js/slider.js?v=4"></script>
+  <script src="/static/js/carousel.js?v=4"></script>
+  <script src="/static/js/map.js?v=4"></script>
+
+  <!-- ДОБАВЛЕНО: members (до main.js) -->
+  <script src="/static/js/members.js?v=4"></script>
+  <script src="/static/js/membership-actions.js?v=4"></script>
+  <script src="/static/js/ticker.js?v=4" defer></script>
+  <script src="/static/js/main.js?v=4"></script>
+  <script src="/static/js/contact.js?v=4"></script>
+
+  <!-- ДОБАВЛЕНО: news logic -->
+  <script src="/static/js/news.js?v=4"></script>
+
+  <!-- ДОБАВЛЕНО: минимальный роутинг без перезагрузки -->
+  <script>
+    (function () {
+      const newsSection = document.getElementById("newsSection");
+      const allSections = Array.from(document.querySelectorAll("section"));
+
+      function showHome() {
+        allSections.forEach(s => { s.style.display = ""; });
+        if (newsSection) newsSection.style.display = "none";
+        window.location.hash = "#about";
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      async function showNews() {
+        allSections.forEach(s => { if (s !== newsSection) s.style.display = "none"; });
+        if (newsSection) newsSection.style.display = "";
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        if (typeof loadNews === "function") {
+          try { await loadNews(); } catch (e) { console.error(e); }
+        }
+      }
+
+      // делаем доступным из HTML, если где-то понадобится
+      window.showNews = showNews;
+      window.showHome = showHome;
+
+      // клики по ссылкам "Новости"
+      document.querySelectorAll("[data-news-link]").forEach(a => {
+        a.addEventListener("click", (e) => {
+          e.preventDefault();
+          showNews();
+          // если открыто мобильное меню — закрываем тем кодом, который уже есть у тебя
+          // (не трогаем твой existing JS; просто снимаем класс если он используется)
+          document.body.classList.remove("menu-open");
+          document.getElementById("mobileNav")?.classList.remove("open");
+          document.getElementById("mobileMenuOverlay")?.classList.remove("open");
+          document.documentElement.classList.remove("no-scroll");
+        });
+      });
+
+      // клики по обычным якорям возвращают "дом" (потому что иначе ты останешься на newsSection)
+      document.querySelectorAll('a[href^="#"]').forEach(a => {
+        a.addEventListener("click", (e) => {
+          const href = a.getAttribute("href");
+          if (!href || href === "#" || href === "#newsSection") return;
+          if (newsSection && newsSection.style.display !== "none") {
+            // если мы на новостях — показываем дом и даём браузеру сделать переход по якорю
+            showHome();
+          }
+        });
+      });
+    })();
+  </script>
 </body>
 </html>

@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Вход в панель ITAS</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='admin/admin.css') }}">
+</head>
+<body class="itas-login-body">
+  <div class="itas-login">
+    <div class="itas-login__card">
+      <div class="itas-login__title">Панель ITAS</div>
+
+      {% if csrf_error %}
+        <div class="itas-flashes"><div class="itas-flash itas-flash--danger">{{ csrf_error }}</div></div>
+      {% endif %}
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="itas-flashes">
+            {% for category, message in messages %}
+              <div class="itas-flash itas-flash--{{ category }}">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <form method="post" action="{{ url_for('auth.login_post', next=request.args.get('next')) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <label class="itas-label" for="login">Логин</label>
+        <input class="itas-input" id="login" name="login" autocomplete="username" required autofocus>
+
+        <label class="itas-label" for="password">Пароль</label>
+        <input class="itas-input" id="password" name="password" type="password" autocomplete="current-password" required>
+
+        <button class="itas-btn itas-btn--primary" type="submit">Войти</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

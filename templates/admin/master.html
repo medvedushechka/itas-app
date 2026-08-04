@@ -1,0 +1,37 @@
+{% extends 'admin/base.html' %}
+
+{% block head_css %}
+  {{ super() }}
+  <link rel="stylesheet" href="{{ url_for('static', filename='admin/admin.css') }}">
+{% endblock %}
+
+{% block page_body %}
+  <div class="itas-admin-shell">
+    <header class="itas-topbar">
+      <div class="itas-topbar__inner">
+        <div class="itas-brand">Beltime Admin</div>
+
+        <nav class="itas-nav">
+          <a class="itas-nav__item" href="/admin/">Home</a>
+          <a class="itas-nav__item" href="/admin/carousel/">Карусель</a>
+          <a class="itas-nav__item" href="/admin/committee/">Комитеты</a>
+          <a class="itas-nav__item" href="/admin/member/">Участники</a>
+          <a class="itas-nav__item" href="/admin/ticker/">Бегущая строка</a>
+          <a class="itas-nav__item" href="/admin/news/">Новости</a>
+          <a class="itas-nav__item" href="/">на Главную</a>
+        </nav>
+
+        <div class="itas-topbar__right">
+          <form method="post" action="{{ url_for('auth.logout') }}" style="margin:0">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="itas-nav__item itas-nav__item--danger" type="submit">Выйти</button>
+          </form>
+        </div>
+      </div>
+    </header>
+
+    <main class="itas-admin-content">
+      {% block body %}{% endblock %}
+    </main>
+  </div>
+{% endblock %}
